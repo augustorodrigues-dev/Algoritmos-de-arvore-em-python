@@ -1,31 +1,40 @@
-# Helldivers: Grafos da Super-Terra v2.0
+# Helldivers: Grafos da Super-Terra v3.4
 
-**Pela Democracia Gerenciada!** Este é um projeto educacional interativo que utiliza a temática do jogo *Helldivers* para ensinar conceitos fundamentais de Teoria dos Grafos e Algoritmos.
+> **"Pela Democracia Gerenciada!"**
 
-## 📋 Sobre o Projeto
+Este é um projeto educacional interativo que utiliza a temática do jogo *Helldivers 2* para ensinar conceitos fundamentais de Teoria dos Grafos e Algoritmos. O sistema simula um mapa galáctico onde o jogador deve usar diferentes algoritmos para resolver problemas de logística, conectividade e navegação entre planetas.
 
-O sistema simula um mapa galáctico onde o jogador deve usar diferentes algoritmos para resolver problemas de logística e conectividade entre planetas. O projeto foi refatorado para seguir boas práticas de engenharia de software, dividindo responsabilidades em múltiplos módulos.
+## 📋 Funcionalidades
 
-### Funcionalidades e Algoritmos
-* **Fase 1 (Autômatos):** Grafos não-direcionados e não-ponderados.
-    * *Algoritmo:* BFS (Busca em Largura) para travessia.
-* **Fase 2 (Terminídeos):** Grafos ponderados (com pesos nas rotas).
-    * *Algoritmo:* Dijkstra para encontrar o caminho mais curto.
-* **Fase 3 (Iluminados):** Dígrafos (Grafos direcionados).
-    * *Algoritmo:* DFS (Busca em Profundidade) para detecção de ciclos.
-* **Dinâmica Extra:** Detecção de Componentes Conexos (desconexão do grafo ao remover rotas).
+O projeto conta com 5 fases distintas, cada uma focada em um tipo de grafo e algoritmo específico:
+
+* **Fase 1 (Autômatos):** Busca em Largura (**BFS**) em grafos não-ponderados.
+* **Fase 2 (Terminídeos):** Algoritmo de **Dijkstra** para caminhos mínimos em grafos ponderados.
+* **Fase 3 (Iluminados):** Busca em Profundidade (**DFS**) para detecção de ciclos em grafos direcionados.
+* **Fase 4 (Zona Instável):** Algoritmo de **Bellman-Ford** (visualização de relaxamento de arestas).
+* **Fase 5 (Abastecimento):** Árvore Geradora Mínima (**MST**) usando o algoritmo de **Prim**.
+
+### Recursos Extras
+* **Visualização Algorítmica:** Animações neon destacam nós visitados, arestas relaxadas e vizinhos em tempo real.
+* **Modo Passo a Passo:** Controle total da execução com botão de "Próximo Passo" ou tecla `[Espaço]`.
+* **Controle de Velocidade:** Ajuste o delay da animação (de 50ms a 2000ms) via interface.
+* **Simulação de Dano:** Pressione `[R]` para destruir rotas aleatórias e visualizar a fragmentação dos componentes conexos.
 
 ## 🚀 Instalação e Execução
 
 ### Pré-requisitos
 * Python 3.10 ou superior.
-* Pip (gerenciador de pacotes).
+* Biblioteca `pygame`.
 
 ### Passo a Passo
 
-1.  **Clone ou baixe o repositório.**
+1.  **Clone o repositório:**
+    ```bash
+    git clone [https://github.com/seu-usuario/helldivers-grafos.git](https://github.com/seu-usuario/helldivers-grafos.git)
+    cd helldivers-grafos
+    ```
 
-2.  **Crie um ambiente virtual (opcional, mas recomendado):**
+2.  **Crie um ambiente virtual (recomendado):**
     ```bash
     python -m venv venv
     # Windows:
@@ -46,35 +55,43 @@ O sistema simula um mapa galáctico onde o jogador deve usar diferentes algoritm
 
 ## 🎮 Controles
 
-| Tecla | Ação |
+| Tecla / Ação | Função |
 | :--- | :--- |
-| **1, 2, 3** | Trocar de Fase (Inimigo/Algoritmo) |
-| **B** | Executar BFS (Fase 1 - Requer origem selecionada) |
-| **D** | Executar Dijkstra (Fase 2 - Requer origem e destino) |
-| **C** | Detectar Ciclos (Fase 3 - Varredura automática) |
-| **R** | Evento Aleatório (Destrói uma rota e analisa a rede) |
+| **1 - 5** | Trocar de Fase (BFS, Dijkstra, DFS, Bellman-Ford, MST) |
+| **Mouse Esq.** | Selecionar Planetas (Origem e Destino) |
+| **B** | Executar BFS (Fase 1) |
+| **D** | Executar Dijkstra (Fase 2) |
+| **C** | Detectar Ciclos (Fase 3) |
+| **F** | Executar Bellman-Ford (Fase 4) |
+| **M** | Gerar MST (Fase 5) |
+| **P** | Alternar entre modo **Automático** e **Manual** |
+| **Espaço** | Avançar um passo (no Modo Manual) |
+| **R** | Evento Aleatório (Destrói uma rota) |
 | **T** | Mostrar/Esconder Tutorial |
-| **ESC** | Sair do Jogo |
-| **Mouse** | Clique esquerdo para selecionar planetas (Origem/Destino) |
+| **ESC** | Sair |
 
 ## 📂 Estrutura do Projeto
 
-O código foi organizado nos seguintes módulos:
+O código foi refatorado para seguir boas práticas de engenharia de software:
 
-* `main.py`: Ponto de entrada. Gerencia o loop principal do jogo e eventos.
-* `config.py`: Constantes globais, configurações de tela e paleta de cores.
-* `models.py`: Classes de dados básicas (`Planeta`, `Aresta`).
-* `graph_system.py`: Lógica pesada. Contém a estrutura de dados do grafo e implementações dos algoritmos (BFS, Dijkstra, DFS).
-* `levels.py`: Construtores dos mapas específicos para cada fase.
-* `ui.py`: Gerenciamento de interface, renderização de textos e HUD.
+* `main.py`: Loop principal, gerenciamento de eventos e renderização da animação.
+* `ui.py`: Desenho da interface, botões, HUD e tutoriais.
+* `graph_system.py`: Estrutura de dados do grafo (Lista de Adjacência).
+* `levels.py`: Configuração dos mapas (coordenadas e conexões dos 16 planetas).
+* `config.py`: Cores, constantes e configurações globais.
+* `models.py`: Classes `Planeta` e `Aresta`.
+* **Algoritmos:**
+    * `bfs.py`: Lógica da Busca em Largura.
+    * `dfs.py`: Lógica da Busca em Profundidade.
+    * `dijkstra.py`: Lógica do Dijkstra.
+    * `bellman_ford.py`: Lógica do Bellman-Ford.
+    * `mst.py`: Lógica do algoritmo de Prim.
 
-## 🎨 Assets (Opcional)
+## 🎨 Assets
 
-Para a experiência completa, crie uma pasta chamada `assets` na raiz do projeto e adicione:
-* `background.png`: Imagem de fundo (1280x720 recomendado).
-* `logo.png`: Logotipo para a tela inicial.
-
-*Caso as imagens não existam, o jogo rodará normalmente com fundo preto e sem logo.*
+O jogo procura por imagens na pasta `assets/`. Caso não as encontre, ele rodará normalmente usando formas geométricas primitivas.
+* `assets/background.png`: Imagem de fundo (1280x720).
+* `assets/logo.png`: Logo para a tela inicial.
 
 ---
-*Desenvolvido para fins educacionais. Super-Terra conta com você!*
+*Desenvolvido para fins educacionais.*
