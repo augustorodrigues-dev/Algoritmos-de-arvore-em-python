@@ -8,6 +8,11 @@ class UIManager:
         self.fonte_normal = fonte_normal
         self.fonte_pequena = fonte_pequena
         
+        self.rect_btn_proximo = pygame.Rect(LARGURA - 180, ALTURA - 60, 160, 40)
+        
+        self.rect_btn_menos = pygame.Rect(LARGURA - 150, 45, 30, 30)
+        self.rect_btn_mais = pygame.Rect(LARGURA - 40, 45, 30, 30)
+        
         try:
             self.logo = pygame.image.load("assets/logo.png").convert_alpha()
             self.logo = pygame.transform.scale(self.logo, (300, int(300 * self.logo.get_height() / self.logo.get_width())))
@@ -75,7 +80,7 @@ class UIManager:
         if typed_chars >= sum(len(s) for s in intro_text):
              self._draw_text("Pressione qualquer tecla para iniciar.", x=LARGURA/2, y=ALTURA - 50, color=AMARELO, center_x=True)
 
-    def draw_hud(self, fase, msgs):
+    def draw_hud(self, fase, msgs, modo_manual):
         panel_surf = pygame.Surface((LARGURA, 80)); panel_surf.set_alpha(COR_PAINEL[3]); panel_surf.fill(COR_PAINEL[:-1])
         self.tela.blit(panel_surf, (0,0))
         pygame.draw.line(self.tela, AMARELO, (0, 80), (LARGURA, 80), 2)
@@ -87,13 +92,48 @@ class UIManager:
         }
         
         self._draw_text(f"OPERAÇÃO GRAFOS | {fase_nomes.get(fase, 'Desconhecido')}", x=20, y=15, font=self.fonte_titulo)
-        controles = "[1-5] Mudar Fase | [T] Tutorial | [R] Evento | [ESC] Sair"
+        
+        status_txt = "MODO: MANUAL" if modo_manual else "MODO: AUTO"
+        cor_status = AMARELO if modo_manual else VERDE
+        largura_txt = self.fonte_titulo.size(status_txt)[0]
+        self._draw_text(status_txt, x=LARGURA - largura_txt - 20, y=10, color=cor_status, font=self.fonte_titulo)
+
+        controles = "[1-5] Mudar Fase | [T] Tutorial | [R] Evento | [P] Auto/Manual"
         self._draw_text(controles, x=20, y=50)
         
         if msgs:
             last_msg = msgs[-1]
             last_msg_surf = self.fonte_normal.render(f"> {last_msg}", True, BRANCO)
-            self.tela.blit(last_msg_surf, (LARGURA/2, 50)) # Centralizado no HUD
+            self.tela.blit(last_msg_surf, (LARGURA/2, 50)) 
+
+    def draw_speed_controls(self, delay_ms):
+        """Desenha os controles de velocidade no HUD."""
+        mouse_pos = pygame.mouse.get_pos()
+        
+        cor_menos = (80, 80, 90) if self.rect_btn_menos.collidepoint(mouse_pos) else (60, 60, 70)
+        pygame.draw.rect(self.tela, cor_menos, self.rect_btn_menos, border_radius=5)
+        pygame.draw.rect(self.tela, BRANCO, self.rect_btn_menos, 1, border_radius=5)
+        self._draw_text("-", self.rect_btn_menos.centerx, self.rect_btn_menos.centery, font=self.fonte_titulo, center_x=True, center_y=True)
+
+        cor_mais = (80, 80, 90) if self.rect_btn_mais.collidepoint(mouse_pos) else (60, 60, 70)
+        pygame.draw.rect(self.tela, cor_mais, self.rect_btn_mais, border_radius=5)
+        pygame.draw.rect(self.tela, BRANCO, self.rect_btn_mais, 1, border_radius=5)
+        self._draw_text("+", self.rect_btn_mais.centerx, self.rect_btn_mais.centery, font=self.fonte_titulo, center_x=True, center_y=True)
+
+        texto_speed = f"{delay_ms}ms"
+        centro_x = (self.rect_btn_menos.right + self.rect_btn_mais.left) / 2
+        self._draw_text(texto_speed, centro_x, 52, font=self.fonte_normal, center_x=True, center_y=True)
+        self._draw_text("DELAY", centro_x, 40, font=self.fonte_pequena, color=CINZA_CLARO, center_x=True, center_y=True)
+
+    def draw_playback_controls(self, anim_ativa: bool, modo_manual: bool):
+        if anim_ativa and modo_manual:
+            mouse_pos = pygame.mouse.get_pos()
+            cor_btn = (80, 80, 90) if self.rect_btn_proximo.collidepoint(mouse_pos) else (60, 60, 70)
+            
+            pygame.draw.rect(self.tela, cor_btn, self.rect_btn_proximo, border_radius=5)
+            pygame.draw.rect(self.tela, BRANCO, self.rect_btn_proximo, 2, border_radius=5)
+            
+            self._draw_text("PRÓXIMO [Espaço]", self.rect_btn_proximo.centerx, self.rect_btn_proximo.centery, font=self.fonte_titulo, center_x=True, center_y=True)
 
     def draw_tutorial(self, fase):
         panel_w, panel_h = 700, 450

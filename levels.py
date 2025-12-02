@@ -1,26 +1,30 @@
 from models import Planeta
 from graph_system import MapaGalactico
-import random
 
 def _gerar_planetas_base() -> dict:
     """Retorna um dicionário com 16 planetas e suas coordenadas."""
     return {
-        "Super-Terra": (640, 650), 
-        "Marte": (640, 580),
-        "Malevelon Creek": (300, 450),
-        "Draupnir": (200, 500),
-        "Ubanea": (150, 350),
-        "Tien Kwan": (350, 300),
-        "Vandalon IV": (250, 200),
-        "Angel's Venture": (980, 450),
-        "Heeth": (1080, 500),
-        "Veld": (1130, 350),
-        "Meridia": (930, 300),
-        "Turing": (1030, 200),
-        "Hellmire": (640, 100),
-        "Estanu": (500, 180),
-        "Crimsica": (780, 180),
-        "Oshaune": (640, 250)
+        "Super-Terra": (640, 685),      
+        "Marte": (640, 615),            
+        
+        "Malevelon Creek": (300, 485),  
+        "Draupnir": (200, 535),         
+        "Ubanea": (150, 385),           
+        "Tien Kwan": (350, 335),        
+        "Vandalon IV": (250, 235),      
+        
+        
+        "Angel's Venture": (980, 485),  
+        "Heeth": (1080, 535),           
+        "Veld": (1130, 385),            
+        "Meridia": (930, 335),          
+        "Turing": (1030, 235),          
+        
+        
+        "Hellmire": (640, 140),         
+        "Estanu": (500, 220),           
+        "Crimsica": (780, 220),         
+        "Oshaune": (640, 290)           
     }
 
 def construir_mapa_fase1() -> MapaGalactico:
@@ -38,7 +42,7 @@ def construir_mapa_fase1() -> MapaGalactico:
         ("Angel's Venture", "Heeth"), ("Angel's Venture", "Meridia"), ("Heeth", "Veld"), ("Veld", "Turing"),
         ("Meridia", "Turing"), ("Meridia", "Crimsica"),
         ("Oshaune", "Estanu"), ("Oshaune", "Crimsica"), ("Estanu", "Hellmire"), ("Crimsica", "Hellmire"),
-        ("Vandalon IV", "Hellmire"), ("Turing", "Hellmire") 
+        ("Vandalon IV", "Hellmire"), ("Turing", "Hellmire")
     ]
     for u, v in rotas: mg.adicionar_rota(u, v)
     return mg
@@ -74,15 +78,15 @@ def construir_mapa_fase3() -> MapaGalactico:
     def RD(a, b): mg.adicionar_rota_dirigida(a, b)
     
     RD("Super-Terra", "Marte")
-    RD("Marte", "Malevelon Creek"); RD("Malevelon Creek", "Draupnir"); RD("Draupnir", "Marte") 
+    RD("Marte", "Malevelon Creek"); RD("Malevelon Creek", "Draupnir"); RD("Draupnir", "Marte")
     RD("Marte", "Angel's Venture"); RD("Angel's Venture", "Heeth"); RD("Heeth", "Veld")
     RD("Veld", "Meridia"); RD("Meridia", "Angel's Venture")
-    RD("Oshaune", "Estanu"); RD("Estanu", "Hellmire"); RD("Hellmire", "Crimsica"); RD("Crimsica", "Oshaune") 
+    RD("Oshaune", "Estanu"); RD("Estanu", "Hellmire"); RD("Hellmire", "Crimsica"); RD("Crimsica", "Oshaune")
     RD("Tien Kwan", "Vandalon IV"); RD("Vandalon IV", "Ubanea")
     return mg
 
 def construir_mapa_fase4() -> MapaGalactico:
-    """Fase 4: Bellman-Ford (Ponderado, pode ser instável)"""
+    """Fase 4: Bellman-Ford (Ponderado, Instável)"""
     mg = construir_mapa_fase2()
     mg.adicionar_rota("Super-Terra", "Hellmire", peso=50)
     mg.adicionar_rota("Malevelon Creek", "Meridia", peso=15)
