@@ -1,13 +1,10 @@
 from __future__ import annotations
-import math
 import random
-import heapq
-from collections import deque
-from typing import Dict, List, Tuple, Optional, Iterable, Generator, Set
+from typing import Dict, List, Tuple, Optional, Iterable, Set
 from models import Planeta, Aresta
 
 class MapaGalactico:
-    """Representação por Lista de Adjacência e Algoritmos."""
+    """Representação por Lista de Adjacência (Dados apenas)."""
     def __init__(self):
         self.planetas: Dict[str, Planeta] = {}
         self.adj: Dict[str, List[Aresta]] = {}
@@ -43,6 +40,7 @@ class MapaGalactico:
         return (e.u, e.v)
 
     def vizinhos(self, u: str) -> Iterable[Tuple[str, float]]:
+        """Retorna iterador de (vizinho, peso) para arestas ativas."""
         for e in self.adj.get(u, []):
             if e.ativa:
                 yield (e.v, e.peso)
@@ -52,97 +50,8 @@ class MapaGalactico:
             for e in lst:
                 yield e
 
-    def bfs_generator(self, origem: str) -> Generator[dict, None, Set[str]]:
-        visitados: Set[str] = set()
-        fila = deque([origem])
-        visitados.add(origem)
-        nivel = {origem: 0}
-        yield {"tipo": "msg", "texto": f"Iniciando Protocolo de Disseminação Democrática a partir de {origem}!"}
-        while fila:
-            u = fila.popleft()
-            yield {"tipo": "bfs_visit", "u": u, "nivel": nivel[u], "visitados": set(visitados)}
-            for v, _ in self.vizinhos(u):
-                if v not in visitados:
-                    visitados.add(v)
-                    nivel[v] = nivel[u] + 1
-                    fila.append(v)
-                    yield {"tipo": "bfs_enfileira", "de": u, "para": v, "nivel": nivel[v], "visitados": set(visitados)}
-        yield {"tipo": "msg", "texto": "Todos os planetas alcançáveis foram assegurados!"}
-        return visitados
-
-    def dijkstra_generator(self, origem: str, destino: str) -> Generator[dict, None, Tuple[List[str], float]]:
-        dist: Dict[str, float] = {p: math.inf for p in self.planetas}
-        prev: Dict[str, Optional[str]] = {p: None for p in self.planetas}
-        dist[origem] = 0.0
-        pq: List[Tuple[float, str]] = [(0.0, origem)]
-        visitados: Set[str] = set()
-        yield {"tipo": "msg", "texto": f"Calculando logística ótima (Dijkstra) de {origem} até {destino}..."}
-        while pq:
-            d, u = heapq.heappop(pq)
-            if u in visitados:
-                continue
-            visitados.add(u)
-            yield {"tipo": "djk_visita", "u": u, "dist": dict(dist), "prev": dict(prev)}
-            if u == destino:
-                break
-            for v, w in self.vizinhos(u):
-                if dist[u] + w < dist[v]:
-                    dist[v] = dist[u] + w
-                    prev[v] = u
-                    heapq.heappush(pq, (dist[v], v))
-                    yield {"tipo": "djk_relax", "de": u, "para": v, "nova_dist": dist[v], "prev": dict(prev)}
-        caminho: List[str] = []
-        if dist[destino] < math.inf:
-            cur: Optional[str] = destino
-            while cur is not None:
-                caminho.append(cur)
-                cur = prev[cur]
-            caminho.reverse()
-        yield {"tipo": "djk_fim", "caminho": list(caminho), "custo": float(dist[destino])}
-        return (caminho, dist[destino])
-
-    def detecting_ciclo_generator(self) -> Generator[dict, None, Optional[List[str]]]:
-        cor: Dict[str, int] = {p: 0 for p in self.planetas}
-        pai: Dict[str, Optional[str]] = {p: None for p in self.planetas}
-        achou: Optional[List[str]] = None
-
-        def dfs(u: str) -> Generator[dict, None, bool]:
-            nonlocal achou
-            cor[u] = 1
-            yield {"tipo": "dfs_enter", "u": u, "cor": dict(cor)}
-            for v, _ in self.vizinhos(u):
-                if cor[v] == 0:
-                    pai[v] = u
-                    yield {"tipo": "dfs_tree", "de": u, "para": v}
-                    if (yield from dfs(v)):
-                        return True
-                elif cor[v] == 1:
-                    yield {"tipo": "dfs_backedge", "de": u, "para": v}
-                    ciclo = [v, u]
-                    x = u
-                    while pai[x] is not None and pai[x] != v:
-                        x = pai[x]
-                        ciclo.append(x)
-                    ciclo.reverse()
-                    achou = ciclo
-                    return True
-            cor[u] = 2
-            yield {"tipo": "dfs_exit", "u": u, "cor": dict(cor)}
-            return False
-
-        yield {"tipo": "msg", "texto": "Varredura psíquica iniciada. Procurando paradoxos de rota..."}
-        for s in self.planetas:
-            if cor[s] == 0:
-                if (yield from dfs(s)):
-                    break
-        if achou:
-            yield {"tipo": "ciclo_encontrado", "ciclo": list(achou)}
-        else:
-            yield {"tipo": "msg", "texto": "Nenhum circuito psíquico detectado."}
-        return achou
-
     def encontrar_componentes_conexos(self) -> List[Set[str]]:
-        """Encontra todos os subgrafos desconectados (componentes conexos)."""
+        """Encontra todos os subgrafos desconectados (usado no evento de dano)."""
         componentes = []
         visitados_globais = set()
         for nome_planeta in self.planetas:

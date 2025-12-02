@@ -8,6 +8,10 @@ from ui import UIManager
 from graph_system import MapaGalactico
 import levels
 
+from bfs import bfs_generator
+from dijkstra import dijkstra_generator
+from dfs import detecting_ciclo_generator
+
 class Jogo:
     def __init__(self):
         pygame.init()
@@ -27,7 +31,6 @@ class Jogo:
             self.background = pygame.transform.scale(bg_orig, (LARGURA, ALTURA))
         except (pygame.error, FileNotFoundError):
             self.background = None
-            print("AVISO: 'assets/background.png' não encontrado. Usando fundo sólido.")
 
         self.game_state = "INTRO"
         self.fase = 1
@@ -129,18 +132,19 @@ class Jogo:
     def iniciar_bfs(self):
         if self.fase != 1: self._say("BFS é um protocolo para setores não-ponderados (Fase 1)."); return
         if self.selecao:
-            self.anim = self.mapa.bfs_generator(self.selecao)
+          
+            self.anim = bfs_generator(self.mapa, self.selecao)
         else: self._say("Selecione um planeta de origem para o BFS.")
 
     def iniciar_dijkstra(self):
         if self.fase != 2: self._say("Dijkstra é para logística em setores ponderados (Fase 2)."); return
         if self.selecao and self.selecao2:
-            self.anim = self.mapa.dijkstra_generator(self.selecao, self.selecao2)
+            self.anim = dijkstra_generator(self.mapa, self.selecao, self.selecao2)
         else: self._say("Selecione um planeta de ORIGEM e um de DESTINO.")
 
     def iniciar_detecção_ciclo(self):
         if self.fase != 3: self._say("Detecção de ciclo é para paradoxos em dígrafos (Fase 3)."); return
-        self.anim = self.mapa.detecting_ciclo_generator()
+        self.anim = detecting_ciclo_generator(self.mapa)
 
     def _planeta_em(self, pos) -> Optional[str]:
         for nome, p in self.mapa.planetas.items():
