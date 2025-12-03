@@ -6,13 +6,13 @@ def detecting_ciclo_generator(grafo) -> Generator[dict, None, Optional[List[str]
     Recebe:
         grafo: Instância de MapaGalactico
     """
-    cor: Dict[str, int] = {p: 0 for p in grafo.planetas} # 0: branco, 1: cinza, 2: preto
+    cor: Dict[str, int] = {p: 0 for p in grafo.planetas} 
     pai: Dict[str, Optional[str]] = {p: None for p in grafo.planetas}
     achou: Optional[List[str]] = None
 
     def dfs(u: str) -> Generator[dict, None, bool]:
         nonlocal achou
-        cor[u] = 1 # Cinza (visitando)
+        cor[u] = 1
         yield {"tipo": "dfs_enter", "u": u, "cor": dict(cor)}
         
         for v, _ in grafo.vizinhos(u):

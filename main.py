@@ -17,7 +17,7 @@ from mst import mst_prim_generator
 class Jogo:
     def __init__(self):
         pygame.init()
-        pygame.display.set_caption("Helldivers: Grafos da Super-Terra v3.4 - Speed Control")
+        pygame.display.set_caption("Helldivers: Grafos da Super-Terra v3.5 - High Visibility")
         self.tela = pygame.display.set_mode((LARGURA, ALTURA))
         self.clock = pygame.time.Clock()
         
@@ -59,13 +59,13 @@ class Jogo:
         self.modo_manual = False
         self.solicitar_proximo_passo = False
         self.timer_animacao = 0 
-        self.DELAY_MS = 600  
+        self.DELAY_MS = 600
         
         self.intro_text = [
-            "> Inicializando v3.4...",
-            "> Controles de velocidade habilitados.",
-            "> Use os botões [+] e [-] no canto superior direito.",
-            "> Ajuste a taxa de atualização conforme complexidade da missão."
+            "> Atualizando Interface Tática...",
+            "> Otimização de leitura de dados logísticos.",
+            "> Pesos de arestas destacados para melhor visualização.",
+            "> Prepare-se para a missão."
         ]
         self.typed_chars = 0
         self.last_char_time = 0
@@ -125,6 +125,7 @@ class Jogo:
                 elif ev.key == pygame.K_SPACE:
                     if self.modo_manual and self.anim: self.solicitar_proximo_passo = True
 
+               
                 elif ev.key == pygame.K_b: self.iniciar_bfs()
                 elif ev.key == pygame.K_d: self.iniciar_dijkstra()
                 elif ev.key == pygame.K_c: self.iniciar_detecção_ciclo()
@@ -132,15 +133,16 @@ class Jogo:
                 elif ev.key == pygame.K_m: self.iniciar_mst()
 
             if ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 1:
+                
                 if self.anim and self.modo_manual and self.ui.rect_btn_proximo.collidepoint(ev.pos):
                     self.solicitar_proximo_passo = True
                     return
                 
                 if self.ui.rect_btn_menos.collidepoint(ev.pos):
-                    self.DELAY_MS = max(50, self.DELAY_MS - 50) 
+                    self.DELAY_MS = max(50, self.DELAY_MS - 50)
                 
                 if self.ui.rect_btn_mais.collidepoint(ev.pos):
-                    self.DELAY_MS = min(2000, self.DELAY_MS + 50) 
+                    self.DELAY_MS = min(2000, self.DELAY_MS + 50)
 
                 clicado = self._planeta_em(ev.pos)
                 if clicado:
@@ -302,7 +304,9 @@ class Jogo:
             
             pygame.draw.line(self.tela, cor, u_pos, v_pos, width)
             if e.dirigida and e.ativa: self._desenhar_seta(u_pos, v_pos, cor)
-            if (self.fase in [2, 4, 5]) and e.ativa: self._desenhar_peso(u_pos, v_pos, e.peso, cor)
+            
+            if (self.fase in [2, 4, 5]) and e.ativa: 
+                self._desenhar_peso(u_pos, v_pos, e.peso, cor)
 
         if len(self.caminho_atual) >= 2:
             pts = [self.mapa.planetas[p].pos for p in self.caminho_atual]
@@ -351,7 +355,18 @@ class Jogo:
 
     def _desenhar_peso(self, a, b, w, cor):
         mx, my = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
-        self.ui._draw_text(f"{int(w)}", int(mx), int(my), color=cor, font=self.fonte_peso_aresta, center_x=True, center_y=True)
+        
+        texto_str = f"{int(w)}"
+        surf = self.fonte_peso_aresta.render(texto_str, True, BRANCO)
+        rect = surf.get_rect(center=(mx, my))
+        
+        bg_rect = rect.inflate(10, 6)
+        
+        pygame.draw.rect(self.tela, (20, 20, 30), bg_rect, border_radius=4)
+        
+        pygame.draw.rect(self.tela, cor, bg_rect, 1, border_radius=4)
+        
+        self.tela.blit(surf, rect)
 
     def run(self):
         while True:

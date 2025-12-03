@@ -4,27 +4,25 @@ from graph_system import MapaGalactico
 def _gerar_planetas_base() -> dict:
     """Retorna um dicionário com 16 planetas e suas coordenadas."""
     return {
-        "Super-Terra": (640, 685),      
-        "Marte": (640, 615),            
+        "Super-Terra": (640, 685),
+        "Marte": (640, 615),
         
-        "Malevelon Creek": (300, 485),  
-        "Draupnir": (200, 535),         
-        "Ubanea": (150, 385),           
-        "Tien Kwan": (350, 335),        
-        "Vandalon IV": (250, 235),      
+        "Malevelon Creek": (300, 485),
+        "Draupnir": (200, 535),
+        "Ubanea": (150, 385),
+        "Tien Kwan": (350, 335),
+        "Vandalon IV": (250, 235),
         
+        "Angel's Venture": (980, 485),
+        "Heeth": (1080, 535),
+        "Veld": (1130, 385),
+        "Meridia": (930, 335),
+        "Turing": (1030, 235),
         
-        "Angel's Venture": (980, 485),  
-        "Heeth": (1080, 535),           
-        "Veld": (1130, 385),            
-        "Meridia": (930, 335),          
-        "Turing": (1030, 235),          
-        
-        
-        "Hellmire": (640, 140),         
-        "Estanu": (500, 220),           
-        "Crimsica": (780, 220),         
-        "Oshaune": (640, 290)           
+        "Hellmire": (640, 140),
+        "Estanu": (500, 220),
+        "Crimsica": (780, 220),
+        "Oshaune": (640, 290)
     }
 
 def construir_mapa_fase1() -> MapaGalactico:
@@ -48,7 +46,7 @@ def construir_mapa_fase1() -> MapaGalactico:
     return mg
 
 def construir_mapa_fase2() -> MapaGalactico:
-    """Fase 2: Dijkstra (Ponderado)"""
+    """Fase 2: Dijkstra (Ponderado - Logística Padrão)"""
     mg = MapaGalactico()
     coords = _gerar_planetas_base()
     faccao = {p: "Terminídeos" for p in coords}; faccao["Super-Terra"] = "Aliança"
@@ -69,7 +67,7 @@ def construir_mapa_fase2() -> MapaGalactico:
     return mg
 
 def construir_mapa_fase3() -> MapaGalactico:
-    """Fase 3: Ciclos (Direcionado)"""
+    """Fase 3: Ciclos (Direcionado - Iluminados)"""
     mg = MapaGalactico()
     coords = _gerar_planetas_base()
     faccao = {p: "Iluminados" for p in coords}; faccao["Super-Terra"] = "Aliança"
@@ -78,20 +76,51 @@ def construir_mapa_fase3() -> MapaGalactico:
     def RD(a, b): mg.adicionar_rota_dirigida(a, b)
     
     RD("Super-Terra", "Marte")
-    RD("Marte", "Malevelon Creek"); RD("Malevelon Creek", "Draupnir"); RD("Draupnir", "Marte")
+    RD("Marte", "Malevelon Creek"); RD("Malevelon Creek", "Draupnir"); RD("Draupnir", "Marte") 
     RD("Marte", "Angel's Venture"); RD("Angel's Venture", "Heeth"); RD("Heeth", "Veld")
-    RD("Veld", "Meridia"); RD("Meridia", "Angel's Venture")
-    RD("Oshaune", "Estanu"); RD("Estanu", "Hellmire"); RD("Hellmire", "Crimsica"); RD("Crimsica", "Oshaune")
+    RD("Veld", "Meridia"); RD("Meridia", "Angel's Venture") 
+    RD("Oshaune", "Estanu"); RD("Estanu", "Hellmire"); RD("Hellmire", "Crimsica"); RD("Crimsica", "Oshaune") 
     RD("Tien Kwan", "Vandalon IV"); RD("Vandalon IV", "Ubanea")
     return mg
 
 def construir_mapa_fase4() -> MapaGalactico:
-    """Fase 4: Bellman-Ford (Ponderado, Instável)"""
-    mg = construir_mapa_fase2()
-    mg.adicionar_rota("Super-Terra", "Hellmire", peso=50)
-    mg.adicionar_rota("Malevelon Creek", "Meridia", peso=15)
+    """
+    Fase 4: Bellman-Ford (Zona Instável).
+    CORREÇÃO: Pesos estritamente positivos para evitar ciclos negativos em grafos não-direcionados.
+    A 'instabilidade' é simulada por pesos muito altos (tempestades de íons) e muito baixos (vácuo).
+    """
+    mg = MapaGalactico()
+    coords = _gerar_planetas_base()
+    faccao = {p: "Autômatos" for p in coords}; faccao["Super-Terra"] = "Aliança"
+    for nome, pos in coords.items(): mg.adicionar_planeta(Planeta(nome, faccao[nome], pos))
+
+    def R(a, b, w): mg.adicionar_rota(a, b, peso=w)
+
+    R("Super-Terra", "Marte", 5)
+    R("Marte", "Oshaune", 50) 
+    R("Oshaune", "Hellmire", 100) 
+
+    R("Marte", "Malevelon Creek", 2)
+    R("Malevelon Creek", "Draupnir", 1)
+    R("Draupnir", "Ubanea", 1)
+    R("Ubanea", "Vandalon IV", 20) 
+    
+    R("Malevelon Creek", "Tien Kwan", 5)
+    R("Tien Kwan", "Estanu", 5)
+    R("Estanu", "Hellmire", 15) 
+    
+    R("Marte", "Angel's Venture", 3)
+    R("Angel's Venture", "Heeth", 2)
+    R("Heeth", "Veld", 5)
+    R("Veld", "Turing", 5)
+    R("Turing", "Crimsica", 40) 
+    R("Angel's Venture", "Meridia", 4)
+    R("Meridia", "Crimsica", 15)
+    R("Crimsica", "Hellmire", 15)
+
     return mg
 
 def construir_mapa_fase5() -> MapaGalactico:
-    """Fase 5: MST (Ponderado, Conectividade total)"""
+    """Fase 5: MST (Abastecimento)"""
+    
     return construir_mapa_fase2()
